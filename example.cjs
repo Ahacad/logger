@@ -1,7 +1,7 @@
 // CommonJS example for logger
 // Run: npm run build && node example.cjs
 
-const logger = require('./dist/index.cjs');
+const { default: logger, MinimalFormatter } = require('./dist/index.cjs');
 
 // Basic usage with default WARN level
 console.log('=== Basic logging (CommonJS) ===');
@@ -38,9 +38,8 @@ logger.error('ERROR message (red)');
 
 // Custom formatting
 console.log('\n=== Minimal formatter ===');
-const defaultFormatter = logger.getFormatter();
-const minimalFormatter = Object.create(defaultFormatter);
-minimalFormatter.setIncludeTimestamps(false);
+// Create a proper MinimalFormatter instance
+const minimalFormatter = new MinimalFormatter(true);
 apiLogger.setFormatter(minimalFormatter);
 apiLogger.info('Using minimal formatter');
 apiLogger.error('Error with minimal formatting');
