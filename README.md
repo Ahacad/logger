@@ -7,15 +7,15 @@ A lightweight, colorful, and feature-rich JavaScript logger with a beautiful int
 ## Features
 
 - ✨ **Multiple Log Levels**: TRACE, DEBUG, INFO, WARN, ERROR, SILENT
-- 🎨 **Colored Output**: Color-coded by log level for easy readability
+- 🎨 **Colored Output**: Enhanced color support for both browsers and terminals
 - 🔀 **Level Filtering**: Disable logs below a certain level
 - 📝 **Named Loggers**: Support for module-specific loggers
 - 💾 **Level Persistence**: Save settings between sessions
 - ⏲ **Timestamps**: Configurable timestamp output
 - 🔌 **Formatters**: Multiple output formats available
 - 🚀 **Lightweight & Fast**: Under 5KB minified and gzipped
-- 📱 **Environment Support**: Works in browsers and Node.js
-- 💻 **TypeScript Ready**: First-class TypeScript support
+- 📱 **Universal Support**: First-class support for ESM and CommonJS
+- 💻 **TypeScript Ready**: Comprehensive TypeScript definitions
 
 ## Installation
 
@@ -25,14 +25,33 @@ npm install logger
 
 ## Quick Start
 
+### ESM (ECMAScript Modules)
+
 ```javascript
+// Modern ES module import
 import logger from 'logger';
 
 // Basic usage
 logger.info('Application started');
 logger.warn('Configuration missing, using defaults');
 logger.error('Failed to connect to database', { host: 'localhost', port: 5432 });
+```
 
+### CommonJS
+
+```javascript
+// CommonJS require
+const logger = require('logger');
+
+// Basic usage
+logger.info('Application started');
+logger.warn('Configuration missing, using defaults');
+logger.error('Failed to connect to database', { host: 'localhost', port: 5432 });
+```
+
+### Named Loggers
+
+```javascript
 // Module specific logger
 const apiLogger = logger.getLogger('api');
 apiLogger.setLevel('debug');
@@ -40,10 +59,10 @@ apiLogger.debug('Request received', { method: 'GET', path: '/users' });
 
 // Customize output
 logger
-  .setLevel('info')   // Only show info and above
-  .useColors(true)    // Enable colors
+  .setLevel('info')     // Only show info and above
+  .useColors(true)      // Enable colors
   .useTimestamps(true)  // Show timestamps
-  .persist();         // Save settings to localStorage/cookies
+  .persist();           // Save settings to localStorage/cookies
 ```
 
 ## Log Levels
@@ -57,17 +76,27 @@ The following log levels are available, in order of verbosity:
 - `ERROR` (4): Errors
 - `SILENT` (5): No logging
 
-## Styled Logging
+## Colored Output
 
-Logger creates beautiful, colored output:
+Logger supports colorized output across environments:
 
-| Level | Color | Example |
-|-------|-------|---------|
-| TRACE | Cyan | ![Trace](https://placehold.co/120x20/4dabf7/white?text=TRACE) |
-| DEBUG | Green | ![Debug](https://placehold.co/120x20/40c057/white?text=DEBUG) |
-| INFO | Blue | ![Info](https://placehold.co/120x20/228be6/white?text=INFO) |
-| WARN | Orange | ![Warn](https://placehold.co/120x20/fd7e14/white?text=WARN) |
-| ERROR | Red | ![Error](https://placehold.co/120x20/fa5252/white?text=ERROR) |
+| Level | Browser | Terminal | Description |
+|-------|---------|----------|-------------|
+| TRACE | Cyan | Cyan | Detailed tracing information |
+| DEBUG | Green | Green | Debug-level messages |
+| INFO | Blue | Bright Blue | Informational messages |
+| WARN | Orange | Yellow | Warning messages |
+| ERROR | Red | Bright Red | Error messages |
+
+Colors are automatically enabled based on environment detection and can be toggled with:
+
+```javascript
+// Enable colors
+logger.useColors(true);
+
+// Disable colors
+logger.useColors(false);
+```
 
 ## API Reference
 
@@ -83,7 +112,7 @@ Logger creates beautiful, colored output:
 ### Configuration
 
 - `logger.setLevel(level, persist?)`: Set the current log level
-- `logger.getLevel()`: Get the current log level
+- `logger.getLevel()`: Get the current log level as enum
 - `logger.getLevelName()`: Get the current log level name
 - `logger.setDefaultLevel(level)`: Set the default log level
 - `logger.resetLevel()`: Reset to the default log level
@@ -114,7 +143,11 @@ The library includes several built-in formatters:
 Example:
 
 ```javascript
+// ESM
 import logger, { JsonFormatter } from 'logger';
+
+// CommonJS
+const { default: logger, JsonFormatter } = require('logger');
 
 // Create a JSON formatter
 const jsonFormatter = new JsonFormatter();
@@ -129,30 +162,56 @@ apiLogger.setFormatter(jsonFormatter);
 
 You can create your own formatter by implementing the `LogFormatter` interface.
 
+## Module Compatibility
+
+This logger provides first-class support for both ESM and CommonJS module systems:
+
+### ESM (ECMAScript Modules)
+
+```javascript
+// Default import
+import logger from 'logger';
+
+// Named imports
+import logger, { LogLevel, JsonFormatter } from 'logger';
+```
+
+### CommonJS
+
+```javascript
+// Direct require (default export)
+const logger = require('logger');
+
+// Destructured require
+const { default: logger, JsonFormatter } = require('logger');
+```
+
 ## Browser Usage
 
 Logger works great in browsers and includes automatic persistence using localStorage or cookies.
 
 ```html
-<script src="path/to/logger.min.js"></script>
-<script>
-  // Logger is available as 'log' global
-  log.info('Logger loaded in browser');
+<script type="module">
+  import logger from 'logger';
+  logger.info('Logger loaded in browser');
   
   // Get a module-specific logger
-  const uiLogger = log.getLogger('ui');
+  const uiLogger = logger.getLogger('ui');
   uiLogger.debug('UI component initialized');
 </script>
 ```
 
 ## Node.js Usage
 
-Use the logger in Node.js applications just as easily:
+Use the logger in Node.js applications:
 
 ```javascript
-const logger = require('logger');
+// ESM
+import logger from 'logger';
+logger.info('Node.js application started');
 
-// Use with CommonJS
+// CommonJS
+const logger = require('logger');
 logger.info('Node.js application started');
 
 // Named loggers work the same
@@ -164,20 +223,19 @@ dbLogger.info('Connected to database');
 
 Check out the included examples:
 
-- `example.js` - Node.js example
-- `example.html` - Browser example
+- `example.cjs` - CommonJS example
+- `example.mjs` - ES Modules example
 
-## Comparison with Other Loggers
+Run them with:
 
-| Feature | Logger | loglevel | js-logger |
-|---------|--------|----------|-----------|
-| Size (min+gzip) | <5KB | 1.4KB | 1.1KB |
-| Colored output | ✅ | ❌ | ❌ |
-| Named loggers | ✅ | ✅ | ✅ |
-| Persistence | ✅ | ✅ | ❌ |
-| Formatters | ✅ | ❌ | ❌ |
-| TypeScript | ✅ | ✅ | ✅ |
+```bash
+# Build the library first
+npm run build
 
+# Run examples
+npm run example:cjs
+npm run example:esm
+```
 ## License
 
 MIT
