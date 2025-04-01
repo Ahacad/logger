@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logger Example</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #2c3e50;
+      border-bottom: 2px solid #ecf0f1;
+      padding-bottom: 10px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      margin: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .demo-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+    }
+    .demo-section h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    .code {
+      font-family: monospace;
+      background-color: #f1f1f1;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    .instructions {
+      color: #7f8c8d;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Logger Demo</h1>
+  <p>Open your browser console (F12 or Ctrl+Shift+J) to see the log output.</p>
+  
+  <div class="demo-section">
+    <h2>Basic Logging</h2>
+    <p class="instructions">Click to see different log levels:</p>
+    <button onclick="log.trace('This is a trace message')">log.trace()</button>
+    <button onclick="log.debug('This is a debug message')">log.debug()</button>
+    <button onclick="log.info('This is an info message')">log.info()</button>
+    <button onclick="log.warn('This is a warning message')">log.warn()</button>
+    <button onclick="log.error('This is an error message')">log.error()</button>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Log Level Control</h2>
+    <p class="instructions">Change the current log level:</p>
+    <button onclick="setLevel('trace')">TRACE</button>
+    <button onclick="setLevel('debug')">DEBUG</button>
+    <button onclick="setLevel('info')">INFO</button>
+    <button onclick="setLevel('warn')">WARN</button>
+    <button onclick="setLevel('error')">ERROR</button>
+    <button onclick="setLevel('silent')">SILENT</button>
+    <p>Current level: <span id="current-level" class="code">WARN</span></p>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Named Loggers</h2>
+    <p class="instructions">Use different loggers for different modules:</p>
+    <button onclick="logFromApi()">API Logger</button>
+    <button onclick="logFromDatabase()">Database Logger</button>
+    <button onclick="logFromAuth()">Auth Logger</button>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Formatting</h2>
+    <p class="instructions">Try different formatting options:</p>
+    <button onclick="toggleColors()">Toggle Colors</button>
+    <button onclick="toggleTimestamps()">Toggle Timestamps</button>
+    <button onclick="useJsonFormatter()">Use JSON Format</button>
+    <button onclick="useMinimalFormatter()">Use Minimal Format</button>
+    <button onclick="useDefaultFormatter()">Use Default Format</button>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Advanced</h2>
+    <p class="instructions">Other features:</p>
+    <button onclick="log.enableAll(); updateLevelDisplay()">Enable All</button>
+    <button onclick="log.disableAll(); updateLevelDisplay()">Disable All</button>
+    <button onclick="log.resetLevel(); updateLevelDisplay()">Reset Level</button>
+    <button onclick="togglePersistence()">Toggle Persistence</button>
+    <span id="persistence-status" class="code">Persistence: Off</span>
+  </div>
+
+  <script src="./dist/index.js"></script>
+  <script>
+    // Keep track of logger state
+    let colorsEnabled = true;
+    let timestampsEnabled = true;
+    let persistenceEnabled = false;
+    
+    // Get named loggers
+    const apiLogger = log.getLogger('api');
+    const dbLogger = log.getLogger('database');
+    const authLogger = log.getLogger('auth');
+    
+    // Format the named loggers
+    apiLogger.useColors(true);
+    dbLogger.useColors(true);
+    authLogger.useColors(true);
+    
+    // Update UI to reflect current level
+    function updateLevelDisplay() {
+      document.getElementById('current-level').textContent = log.getLevelName();
+    }
+    
+    // Set log level and update display
+    function setLevel(level) {
+      log.setLevel(level, persistenceEnabled);
+      updateLevelDisplay();
+      log.info(`Log level set to ${level.toUpperCase()}`);
+    }
+    
+    // Log from different modules
+    function logFromApi() {
+      apiLogger.info('API request received', { method: 'GET', path: '/users' });
+    }
+    
+    function logFromDatabase() {
+      dbLogger.info('Database query executed', { table: 'users', rows: 42 });
+    }
+    
+    function logFromAuth() {
+      authLogger.info('User authenticated', { userId: 123, role: 'admin' });
+    }
+    
+    // Toggle formatting options
+    function toggleColors() {
+      colorsEnabled = !colorsEnabled;
+      log.useColors(colorsEnabled);
+      apiLogger.useColors(colorsEnabled);
+      dbLogger.useColors(colorsEnabled);
+      authLogger.useColors(colorsEnabled);
+      log.info(`Colors ${colorsEnabled ? 'enabled' : 'disabled'}`);
+    }
+    
+    function toggleTimestamps() {
+      timestampsEnabled = !timestampsEnabled;
+      log.useTimestamps(timestampsEnabled);
+      apiLogger.useTimestamps(timestampsEnabled);
+      dbLogger.useTimestamps(timestampsEnabled);
+      authLogger.useTimestamps(timestampsEnabled);
+      log.info(`Timestamps ${timestampsEnabled ? 'enabled' : 'disabled'}`);
+    }
+    
+    // Switch formatters
+    function useJsonFormatter() {
+      const JsonFormatter = log.JsonFormatter;
+      log.setFormatter(new JsonFormatter());
+      log.info('Switched to JSON formatter');
+    }
+    
+    function useMinimalFormatter() {
+      const MinimalFormatter = log.MinimalFormatter;
+      log.setFormatter(new MinimalFormatter(colorsEnabled));
+      log.info('Switched to minimal formatter');
+    }
+    
+    function useDefaultFormatter() {
+      const DefaultFormatter = log.DefaultFormatter;
+      log.setFormatter(new DefaultFormatter(colorsEnabled, timestampsEnabled));
+      log.info('Switched to default formatter');
+    }
+    
+    // Toggle persistence
+    function togglePersistence() {
+      persistenceEnabled = !persistenceEnabled;
+      
+      if (persistenceEnabled) {
+        log.persist();
+        document.getElementById('persistence-status').textContent = 'Persistence: On';
+        log.info('Log level persistence enabled - levels will be saved');
+      } else {
+        log.resetLevel();
+        document.getElementById('persistence-status').textContent = 'Persistence: Off';
+        log.info('Log level persistence disabled - levels will not be saved');
+      }
+      
+      updateLevelDisplay();
+    }
+    
+    // Initial setup
+    updateLevelDisplay();
+    log.info('Logger demo initialized');
+  </script>
+</body>
+</html>
