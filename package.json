@@ -1,5 +1,8 @@
 {
   "name": "@ahacad/logger",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "A lightweight, colorful, and feature-rich JavaScript logger",
   "keywords": [
